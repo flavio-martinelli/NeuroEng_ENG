@@ -18,16 +18,12 @@ Fs = 20000;
 figure(1)
 plot(zscore(signal));
 hold on;
+plot(labels,'r');
 title('ENG original signal and stimuli application labels')
 xlim([1 , length(signal)]);
-ylabel('ENG');
-xlabel('Samples')
 
-yyaxis right
-plot(zscore(labels),'r');
-ylim([-5 5])
-ylabel('Labels: -1 = rest, +1 = activity');
-
+yyaxis;
+ylabel('Labels ');
 
 %% Examination of the spectral context of the signal-PSD
 
