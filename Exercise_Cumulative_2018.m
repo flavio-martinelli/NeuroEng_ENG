@@ -35,8 +35,8 @@ ylabel('Labels: -1 = rest, +1 = activity');
 [rows_rest,cols_rest,values_rest] = find(labels==0);
 
 figure(2)
-signalOfInterest=signal(rows_act);
-notOfInterest=signal(rows_rest);
+signalOfInterest = signal(rows_act);
+notOfInterest    = signal(rows_rest);
 h = spectrum.welch; % creates the Welch spectrum estimator
 SOIf=psd(h,signalOfInterest,'Fs',Fs); % calculates and plot the one sided PSD
 NOIf=psd(h,notOfInterest,'Fs',Fs);
@@ -45,12 +45,24 @@ hold on;
 plot(NOIf);
 title('Spectrum of SOI, and NOI for the stimuli application')
 
+ciao = SOIf.copy();
+
+figure(3)
+plot(SOIf.getdata() - NOIf.getdata());
+xlim([0 130])
+xticks(0:13:130)
+xticklabels(xticks/13)
+ylabel('Power/frequency (dB/Hz)')
+xlabel('Frequency (kHz)')
+title('Difference spectrum of SOI, and NOI for the stimuli application');
+grid on
+
 %% Filtering 
 
 %Determine the Low pass cutoff frequency for your filter
-Fl=;
+Fl=800;
 %Determine the High pass cutoff frequency for your filter
-Fh=;
+Fh=2200;
 
 
 [Signal_filtered]=filtra(signal',Fs,Fl,Fh);
@@ -69,7 +81,7 @@ title('Spectrum of SOI, and NOI for VF')
 %% Feature extraction 
 
 % Determine the step size                                          
-step=; 
+step=Fs*0.1; 
 
 % Compute the MAV and Zero-Crossing features for each time window                      
 % Hint: MAV and ZeroCross can be functions in separate files         
@@ -82,7 +94,7 @@ for i=1:step:(L2-step)
 end
 
 % Resizing the label vector to the size of the features vector
-for i=1:step:(L2-step);  
+for i=1:step:(L2-step) 
     z=ceil(i/step);
     labels_resized(z)=labels(i);
 end
