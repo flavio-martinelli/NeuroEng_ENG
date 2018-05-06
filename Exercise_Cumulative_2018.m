@@ -48,9 +48,9 @@ title('Spectrum of SOI, and NOI for the stimuli application')
 %% Filtering 
 
 %Determine the Low pass cutoff frequency for your filter
-Fl=;
+Fl=800;
 %Determine the High pass cutoff frequency for your filter
-Fh=;
+Fh=2200;
 
 
 [Signal_filtered]=filtra(signal',Fs,Fl,Fh);
@@ -68,21 +68,26 @@ title('Spectrum of SOI, and NOI for VF')
 
 %% Feature extraction 
 
-% Determine the step size                                          
-step=; 
+% Determine the step size
+
+step=0.1 * Fs; %  step size for 100 ms window
 
 % Compute the MAV and Zero-Crossing features for each time window                      
 % Hint: MAV and ZeroCross can be functions in separate files         
 
 
 L2=length(signal);
+
 for i=1:step:(L2-step)
     % Compute MAV and ZCross features and store them in a 2D
     % "features" vector
+    MAVI((i-1)/step +1) = MAV(signal(i:i+step));
+    ZCrossi((i-1)/step +1) = ZCross(signal(i:i+step));
+    
 end
 
 % Resizing the label vector to the size of the features vector
-for i=1:step:(L2-step);  
+for i=1:step:(L2-step)  
     z=ceil(i/step);
     labels_resized(z)=labels(i);
 end
