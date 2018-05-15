@@ -44,11 +44,12 @@ for k = 1:length(filenames)
     h = spectrum.welch; % creates the Welch spectrum estimator
     SOIf=psd(h,signalOfInterest,'Fs',Fs); % calculates and plot the one sided PSD
     NOIf=psd(h,notOfInterest,'Fs',Fs);
-    plot(SOIf); % Plot the one-sided PSD.
-    hold on;
-    plot(NOIf);
-    title('Spectrum of SOI, and NOI for the stimuli application')
-    
+    plot(SOIf) % Plot the one-sided PSD.
+    hold on
+    plot(NOIf)
+    title('Spectrum of SOI and NOI for the stimuli application')
+    legend('SOI (upper curve)','NOI (lower curve)')
+
     ciao = SOIf.copy();
     
     figure()
@@ -58,7 +59,7 @@ for k = 1:length(filenames)
     xticklabels(xticks/13)
     ylabel('Power/frequency (dB/Hz)')
     xlabel('Frequency (kHz)')
-    title('Difference spectrum of SOI, and NOI for the stimuli application');
+    title('Difference spectrum of SOI and NOI for the stimuli application');
     grid on
     
     %% Filtering
@@ -71,7 +72,7 @@ for k = 1:length(filenames)
     
     [Signal_filtered]=filtra(signal',Fs,Fl,Fh);
     
-    figure(3)
+    figure()
     soi_f=Signal_filtered(rows_act);
     noi_f=Signal_filtered(rows_rest);
     h1 = spectrum.welch; % creates the Welch spectrum estimator
@@ -80,8 +81,9 @@ for k = 1:length(filenames)
     plot(SOI_f); % Plot the one-sided PSD.
     hold on;
     plot(NOI_f);
-    title(['Spectrum of SOI, and NOI for ', f_map(filenames{k})])
-    
+    title('Spectrum of SOI and NOI after filtering')
+    legend('SOI (upper curve)','NOI (lower curve)')
+
     %% Feature extraction
     
     % Determine the step size
@@ -97,8 +99,8 @@ for k = 1:length(filenames)
         % Compute MAV and ZCross features and store them in a 2D
         % "features" vector
         MAVI((i-1)/step +1) = MAV(signal(i:i+step));
-        ZCrossi((i-1)/step +1) = ZCross(signal(i:i+step));
-        
+        Wavelengthi((i-1)/step +1) = Wavelength(signal(i:i+step));
+        ZCrossi((i-1)/step + 1) =  ZCross(signal(i:i+step));
     end
     
     % Resizing the label vector to the size of the features vector
@@ -110,18 +112,21 @@ for k = 1:length(filenames)
     % plot the zscored features along with the corresponding labels
     
     zMAVI =  zscore(MAVI);
-    zZCrossi = zscore(ZCrossi);
+    zWavelengthi = zscore(Wavelengthi);
+    zZCrossi  = zscore(ZCrossi);
     
     figure
     plot(zMAVI)
     hold on
+    plot(zWavelengthi)
     plot(zZCrossi)
+
     stairs(labels_resized,'LineWidth',1.2)
     grid on
     grid minor
     xlabel('ROW')
     ylabel('Normalized feature value')
-    legend('MAV','ZCross','Labels')
+    legend('MAV','Wavelength','ZCross','Labels')
     title(['Normalized features for ',f_map(filenames{k})])
     
     %% Signal-to-Noise Estimation
@@ -129,6 +134,7 @@ for k = 1:length(filenames)
     % Extract the features for the non zero labels
     
     MAVI_SOI = MAVI(labels_resized  ~= 0);
+    Wavelengthi_SOI = Wavelengthi(labels_resized ~= 0);
     ZCrossi_SOI = ZCrossi(labels_resized ~= 0);
     
     % Compute Activation
@@ -136,6 +142,7 @@ for k = 1:length(filenames)
     % Extract the features for the labels = zero
     
     MAVI_NOI = MAVI(labels_resized  == 0);
+    Wavelengthi_NOI = Wavelengthi(labels_resized == 0);
     ZCrossi_NOI = ZCrossi(labels_resized == 0);
     
     % Compute the noise, SNR and SNR in dB
@@ -143,10 +150,12 @@ for k = 1:length(filenames)
     
     SNR_signal = mean(activation)/mean(noise);
     SNR_MAVI = mean(MAVI_SOI)/mean(MAVI_NOI);
+    SNR_Wavelengthi = mean(Wavelengthi_SOI)/mean(Wavelengthi_NOI);
     SNR_ZCrossi = mean(ZCrossi_SOI)/mean(ZCrossi_NOI);
     
     SNR_signal_dB(k) = 20 * log10 (SNR_signal);
     SNR_MAVI_dB(k)= 20 * log10(SNR_MAVI);
-    SNR_ZCrossi_dB(k) = 20 * log10(SNR_ZCrossi);
+    SNR_Wavelengthi_dB(k) = 20 * log10(SNR_Wavelengthi);
+    SNR_ZCrossi_dB(k) = 20*log10(SNR_ZCrossi);
     
 end
