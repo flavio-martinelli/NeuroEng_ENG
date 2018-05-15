@@ -4,7 +4,7 @@ neuralData=load ('Proprio_1.txt');
 Fs=24414.06;
 
 % Compute the time vector from the frequency value
-time= (1:length(neuralData))/Fs;
+time = (1:length(neuralData))/Fs;
 
 
 %% Pre-processing of the signal 
@@ -133,8 +133,10 @@ threshold = 4;
 shift = round(Fs*0.2);
 
 [spikes,spikeidx] = spike_extract(neuralData,threshold,Fs,timeWindow);
+
 n_windows = ceil(length(neuralData)/shift);
 fires = zeros(1,n_windows);
+
 for i = 1:length(spikeidx)
      window_of_interest  = ceil(spikeidx(i)/shift);
      fires(window_of_interest) = fires(window_of_interest) + 1; 
@@ -142,11 +144,30 @@ end
 
 firing_rate = fires / 0.2;
 % Plot the original neural signal overlapped with the detected spikes
+spikes_signal = zeros(1,length(neuralData));
+% for i = 1:length(spikeidx)
+%     spikes_signal(spikeidx(i):spikeidx(i)+48)=spikes(i,:);
+% end
+
 figure
-plot(neuralData)
+plot(time,neuralData)
 hold on
-stairs(firing_rate)
+plot((spikeidx)/Fs, neuralData(spikeidx),'*')
+plot(time,spikes_signal)
 xlabel('Time (s)')
 ylabel('Potential (mV)')
+legend('Recording','Spike')
+
 % Plot the original neural signal overlapped with the calculated firing
 % rate
+x_axis =  (1:n_windows)*0.2;
+
+figure
+yyaxis left
+plot(time,neuralData)
+hold on
+yyaxis right
+stairs(x_axis,firing_rate,'LineWidth',1.2)
+xlabel('Time (s)')
+ylabel('Potential (mV)')
+ylim([-15 15])
