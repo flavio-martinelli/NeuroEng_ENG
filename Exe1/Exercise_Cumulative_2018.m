@@ -32,7 +32,6 @@ for k = 1:length(filenames)
     ylim([-5 5])
     ylabel('Labels: -1 = rest, +1 = activity');
     
-    
     %% Examination of the spectral context of the signal-PSD
     
     [rows_act,cols_act,values_act] = find(labels>0);
